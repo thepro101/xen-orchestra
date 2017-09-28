@@ -163,7 +163,11 @@ var messages = {
   srNotSharedType: 'Not shared {type}',
 
   // ----- Common components -----
-  sortedTableSelectedItems: '{selected, number} selected on {total, number}',
+  sortedTableAllItemsSelected: 'All of them are selected',
+  sortedTableNumberOfFilteredItems: '{nFiltered, number} of {nTotal, number} items',
+  sortedTableNumberOfItems: '{nTotal, number} items',
+  sortedTableNumberOfSelectedItems: '{nSelected, number} selected',
+  sortedTableSelectAllItems: 'Click here to select all items',
 
   // ----- Forms -----
   add: 'Add',
@@ -302,6 +306,7 @@ var messages = {
   remoteTypeNfs: 'NFS',
   remoteTypeSmb: 'SMB',
   remoteType: 'Type',
+  remoteSmbWarningMessage: 'SMB remotes are meant to work on Windows Server. For other systems (Linux Samba, which means almost all NAS), please use NFS.',
   remoteTestTip: 'Test your remote',
   testRemote: 'Test Remote',
   remoteTestFailure: 'Test failed for {name}',
@@ -738,6 +743,8 @@ var messages = {
   resetBootOption: 'Reset',
   deleteSelectedVdis: 'Delete selected VDIs',
   deleteSelectedVdi: 'Delete selected VDI',
+  useQuotaWarning: 'Creating this disk will use the disk space quota from the resource set {resourceSet} ({spaceLeft} left)',
+  notEnoughSpaceInResourceSet: 'Not enough space in resource set {resourceSet} ({spaceLeft} left)',
 
   // ----- VM network tab -----
   vifCreateDeviceButton: 'New device',
