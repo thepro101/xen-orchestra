@@ -56,7 +56,7 @@ const XOSAN_COLUMNS = [
       const pbdsDetached = every(map(sr.pbds, 'attached')) ? null : _('xosanPbdsDetached')
       const badStatus = status && every(status[sr.id])
         ? null
-        : _('xosanBadStatus', { badStatuses: <ul>map(status, (_, status) => <li key={status}>{status}</li>)</ul> })
+        : _('xosanBadStatus', { badStatuses: <ul>{map(status, (_, status) => <li key={status}>{status}</li>)}</ul> })
 
       if (pbdsDetached != null || badStatus != null) {
         return <Tooltip content={pbdsDetached || badStatus}>
@@ -71,7 +71,13 @@ const XOSAN_COLUMNS = [
   },
   {
     name: _('xosanPool'),
-    itemRenderer: sr => sr.pool == null ? null : <Link to={`/pools/${sr.pool.id}`}>{sr.pool.name_label}</Link>,
+    itemRenderer: sr => sr.pool == null ? null
+      : <span><Link to={`/pools/${sr.pool.id}`}>{sr.pool.name_label}</Link>{sr.pool.HA_enabled &&
+      <span>
+                  &nbsp;&nbsp;
+        <Tooltip content={_('highAvailability')}><span className='fa-stack'> <Icon icon='pool'/> <Icon icon='success'
+                                                                                                       className='fa-stack-1x'/> </span> </Tooltip> </span>
+      }</span>,
     sortCriteria: sr => sr.pool && sr.pool.name_label
   },
   {
