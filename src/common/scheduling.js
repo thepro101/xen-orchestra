@@ -75,11 +75,11 @@ const WEEK_DAYS = [
 const HOURS = (() => {
   const hours = []
 
-  for (let i = 0; i < 3; i++) {
+  for (let i = 0; i < 4; i++) {
     hours[i] = []
 
-    for (let j = 0; j < 8; j++) {
-      hours[i].push(8 * i + j)
+    for (let j = 0; j < 6; j++) {
+      hours[i].push(6 * i + j)
     }
   }
 
@@ -147,6 +147,13 @@ export class SchedulePreview extends Component {
     const { value } = this.state
 
     const cronSched = later.parse.cron(cronPattern)
+
+    // Due to implementation, the range used for months is 0-11
+    // instead of 1-12
+    forEach(cronSched.schedules[0].M, (v, i, a) => {
+      a[i] = v + 1
+    })
+
     const dates = later.schedule(cronSched).next(value)
 
     return (
@@ -187,7 +194,14 @@ class ToggleTd extends Component {
   render () {
     const { props } = this
     return (
-      <td style={CLICKABLE} className={props.value ? 'table-success' : ''} onClick={this._onClick}>
+      <td
+        className={classNames(
+          'text-xs-center',
+          props.value && 'table-success'
+        )}
+        onClick={this._onClick}
+        style={CLICKABLE}
+      >
         {props.children}
       </td>
     )
@@ -504,7 +518,7 @@ export default class Scheduler extends Component {
     return (
       <div className='card-block'>
         <Row>
-          <Col mediumSize={6}>
+          <Col largeSize={6}>
             <TimePicker
               labelId='Month'
               optionRenderer={getMonthName}
@@ -513,13 +527,17 @@ export default class Scheduler extends Component {
               range={MONTHS_RANGE}
               value={cronPatternArr[PICKTIME_TO_ID['month']]}
             />
+          </Col>
+          <Col largeSize={6}>
             <DayPicker
               onChange={this._dayChange}
               monthDayPattern={cronPatternArr[PICKTIME_TO_ID['monthDay']]}
               weekDayPattern={cronPatternArr[PICKTIME_TO_ID['weekDay']]}
             />
           </Col>
-          <Col mediumSize={6}>
+        </Row>
+        <Row>
+          <Col largeSize={6}>
             <TimePicker
               labelId='Hour'
               options={HOURS}
@@ -527,6 +545,8 @@ export default class Scheduler extends Component {
               onChange={this._hourChange}
               value={cronPatternArr[PICKTIME_TO_ID['hour']]}
             />
+          </Col>
+          <Col largeSize={6}>
             <TimePicker
               labelId='Minute'
               options={MINS}
