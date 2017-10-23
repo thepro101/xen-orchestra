@@ -75,8 +75,8 @@ const XOSAN_COLUMNS = [
       : <span><Link to={`/pools/${sr.pool.id}`}>{sr.pool.name_label}</Link>{sr.pool.HA_enabled &&
       <span>
                   &nbsp;&nbsp;
-        <Tooltip content={_('highAvailability')}><span className='fa-stack'> <Icon icon='pool'/> <Icon icon='success'
-                                                                                                       className='fa-stack-1x'/> </span> </Tooltip> </span>
+        <Tooltip content={_('highAvailability')}><span className='fa-stack'> <Icon icon='pool' /> <Icon icon='success'
+          className='fa-stack-1x' /> </span> </Tooltip> </span>
       }</span>,
     sortCriteria: sr => sr.pool && sr.pool.name_label
   },
