@@ -76,7 +76,7 @@ const XOSAN_COLUMNS = [
       : <span>
         <Link to={`/pools/${sr.pool.id}`}>{sr.pool.name_label}</Link>
         {sr.pool.HA_enabled && <span>
-          &nbsp;&nbsp;
+          {' '}
           <Tooltip content={_('highAvailability')}>
             <span className='fa-stack'>
               <Icon icon='pool' /><Icon icon='success' className='fa-stack-1x' />
@@ -122,6 +122,7 @@ const XOSAN_COLUMNS = [
 
 const XOSAN_INDIVIDUAL_ACTIONS = [
   {
+    disabled: sr => sr.pool.HA_enabled,
     handler: deleteSr,
     icon: 'delete',
     label: _('xosanDelete'),
