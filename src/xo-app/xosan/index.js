@@ -122,7 +122,6 @@ const XOSAN_COLUMNS = [
 
 const XOSAN_INDIVIDUAL_ACTIONS = [
   {
-    disabled: sr => sr.pool.HA_enabled,
     handler: deleteSr,
     icon: 'delete',
     label: _('xosanDelete'),
