@@ -1118,6 +1118,12 @@ export const attachDiskToVm = (vdi, vm, { bootable, mode, position }) => (
   })
 )
 
+export const createVgpu = (vm, { gpuGroup, vgpuType }) =>
+  _call('vm.createVgpu', resolveIds({ vm, gpuGroup, vgpuType }))
+
+export const deleteVgpu = vgpu =>
+  _call('vm.deleteVgpu', resolveIds({ vgpu }))
+
 // DISK ---------------------------------------------------------------
 
 export const createDisk = (name, size, sr, { vm, bootable, mode, position }) => (
@@ -1153,7 +1159,7 @@ export const deleteVdis = vdis => (
     title: _('deleteVdisModalTitle', { nVdis: vdis.length }),
     body: _('deleteVdisModalMessage', { nVdis: vdis.length })
   }).then(
-    () => Promise.all(map(vdis, id => _call('vdi.delete', { id }))),
+    () => Promise.all(map(vdis, vdi => _call('vdi.delete', { id: resolveId(vdi) }))),
     noop
   )
 )

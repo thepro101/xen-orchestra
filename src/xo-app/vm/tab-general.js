@@ -6,13 +6,19 @@ import isEmpty from 'lodash/isEmpty'
 import map from 'lodash/map'
 import React from 'react'
 import HomeTags from 'home-tags'
+import renderXoItem from 'render-xo-item'
 import Tooltip from 'tooltip'
 import { addTag, editVm, removeTag } from 'xo'
-import { createGetVmLastShutdownTime } from 'selectors'
 import { BlockLink } from 'link'
 import { FormattedRelative } from 'react-intl'
 import { Container, Row, Col } from 'grid'
 import { Number, Size } from 'editable'
+import {
+  createFinder,
+  createGetObjectsOfType,
+  createGetVmLastShutdownTime,
+  createSelector
+} from 'selectors'
 import {
   connectStore,
   formatSize,
@@ -21,16 +27,38 @@ import {
 import {
   CpuSparkLines,
   MemorySparkLines,
-  VifSparkLines,
+  NetworkSparkLines,
   XvdSparkLines
 } from 'xo-sparklines'
 
 export default connectStore(() => {
-  return { lastShutdownTime: createGetVmLastShutdownTime() }
+  const getVgpus = createGetObjectsOfType('vgpu').pick(
+    (_, { vm }) => vm.$VGPUs
+  ).sort()
+
+  const getAttachedVgpu = createFinder(
+    getVgpus,
+    vgpu => vgpu.currentlyAttached
+  )
+
+  const getVgpuTypes = createGetObjectsOfType('vgpuType').pick(
+    createSelector(
+      getVgpus,
+      vgpus => map(vgpus, 'vgpuType')
+    )
+  )
+
+  return {
+    lastShutdownTime: createGetVmLastShutdownTime(),
+    vgpu: getAttachedVgpu,
+    vgpuTypes: getVgpuTypes
+  }
 })(
  ({
   lastShutdownTime,
   statsOverview,
+  vgpu,
+  vgpuTypes,
   vm,
   vmTotalDiskSpace
 }) => <Container>
@@ -50,7 +78,7 @@ export default connectStore(() => {
     </Col>
     <Col mediumSize={3}>
       <BlockLink to={`/vms/${vm.id}/network`}><h2>{vm.VIFs.length}x <Icon icon='network' size='lg' /></h2></BlockLink>
-      <BlockLink to={`/vms/${vm.id}/stats`}>{statsOverview && <VifSparkLines data={statsOverview} />}</BlockLink>
+      <BlockLink to={`/vms/${vm.id}/stats`}>{statsOverview && <NetworkSparkLines data={statsOverview} />}</BlockLink>
     </Col>
     <Col mediumSize={3}>
       <BlockLink to={`/vms/${vm.id}/disks`}><h2>{formatSize(vmTotalDiskSpace)} <Icon icon='disk' size='lg' /></h2></BlockLink>
@@ -80,6 +108,9 @@ export default connectStore(() => {
           : _('hardwareVirtualizedMode')
         }
       </p>
+      {vgpu !== undefined && <p>
+        {renderXoItem(vgpuTypes[vgpu.vgpuType])}
+      </p>}
     </Col>
     <Col mediumSize={3}>
       <BlockLink to={`/vms/${vm.id}/network`}>
@@ -92,7 +123,16 @@ export default connectStore(() => {
       </BlockLink>
     </Col>
     <Col mediumSize={3}>
-      <BlockLink to={`/vms/${vm.id}/advanced`}><Tooltip content={vm.os_version ? vm.os_version.name : _('unknownOsName')}><h1><Icon className='text-info' icon={vm.os_version && vm.os_version.distro && osFamily(vm.os_version.distro)} /></h1></Tooltip></BlockLink>
+      <BlockLink to={`/vms/${vm.id}/advanced`}>
+        <Tooltip content={vm.os_version ? vm.os_version.name : _('unknownOsName')}>
+          <h1>
+            <Icon
+              className='text-info'
+              icon={vm.os_version && vm.os_version.distro && osFamily(vm.os_version.distro)}
+            />
+          </h1>
+        </Tooltip>
+      </BlockLink>
     </Col>
   </Row>
   {!vm.xenTools && vm.power_state === 'Running' &&

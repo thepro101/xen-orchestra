@@ -3,7 +3,7 @@ import ActionButton from 'action-button'
 import BaseComponent from 'base-component'
 import Button from 'button'
 import classNames from 'classnames'
-import defined from 'xo-defined'
+import defined, { get } from 'xo-defined'
 import Icon from 'icon'
 import isIp from 'is-ip'
 import Page from '../page'
@@ -25,7 +25,6 @@ import {
   filter,
   find,
   forEach,
-  get,
   includes,
   isEmpty,
   join,
@@ -60,6 +59,7 @@ import {
   SelectSr,
   SelectSshKey,
   SelectVdi,
+  SelectVgpuType,
   SelectVmTemplate
 } from 'select-objects'
 import {
@@ -372,7 +372,9 @@ export default class NewVm extends BaseComponent {
       share: state.share,
       cloudConfig,
       coreOs: state.template.name_label === 'CoreOS',
-      tags: state.tags
+      tags: state.tags,
+      vgpuType: get(() => state.vgpuType.id),
+      gpuGroup: get(() => state.vgpuType.gpuGroup)
     }
 
     return state.multipleVms ? createVms(data, state.nameLabels) : createVm(data)
@@ -545,8 +547,8 @@ export default class NewVm extends BaseComponent {
       }
 
       const containers = [
-        ...map(existingDisks, disk => get(srs, `${disk.$SR}.$container`)),
-        ...map(VDIs, disk => get(srs, `${disk.SR}.$container`))
+        ...map(existingDisks, disk => get(() => srs[disk.$SR].$container)),
+        ...map(VDIs, disk => get(() => srs[disk.SR].$container))
       ]
       return host => host.$pool === pool.id &&
         every(containers, container =>
@@ -572,6 +574,11 @@ export default class NewVm extends BaseComponent {
       '{name}': state => state.name_label || '',
       '%': (_, i) => i
     })
+  )
+
+  _getVgpuTypePredicate = createSelector(
+    () => this.props.pool,
+    pool => vgpuType => pool !== undefined && pool.id === vgpuType.$pool
   )
 
   _getCoresPerSocketPossibilities = createSelector(
@@ -1230,7 +1237,8 @@ export default class NewVm extends BaseComponent {
       seqStart,
       share,
       showAdvanced,
-      tags
+      tags,
+      template
     } = this.state.state
     const { isAdmin } = this.props
     const { formatMessage } = this.props.intl
@@ -1371,6 +1379,14 @@ export default class NewVm extends BaseComponent {
               value={affinityHost}
             />
           </Item>
+        </SectionContent>,
+        template && template.virtualizationMode === 'hvm' && <SectionContent>
+          <Item label={_('vmVgpu')}>
+            <SelectVgpuType
+              onChange={this._linkState('vgpuType')}
+              predicate={this._getVgpuTypePredicate()}
+            />
+          </Item>
         </SectionContent>
       ]}
     </Section>
@@ -1490,9 +1506,9 @@ export default class NewVm extends BaseComponent {
     const factor = multipleVms ? nameLabels.length : 1
 
     return !(
-      CPUs * factor > get(resourceSet, 'limits.cpus.available') ||
-      memoryDynamicMax * factor > get(resourceSet, 'limits.memory.available') ||
-      (sumBy(VDIs, 'size') + sum(map(existingDisks, disk => disk.size))) * factor > get(resourceSet, 'limits.disk.available')
+      CPUs * factor > get(() => resourceSet.limits.cpus.available) ||
+      memoryDynamicMax * factor > get(() => resourceSet.limits.memory.available) ||
+      (sumBy(VDIs, 'size') + sum(map(existingDisks, disk => disk.size))) * factor > get(() => resourceSet.limits.disk.available)
     )
   }
 }
