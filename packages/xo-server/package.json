@@ -132,6 +132,9 @@
     "index-modules": "^0.3.0",
     "rimraf": "^2.6.2"
   },
+  "optionalDependencies": {
+    "why-is-node-running": "^2.0.2"
+  },
   "scripts": {
     "build": "cross-env NODE_ENV=production babel --source-maps --out-dir=dist/ src/",
     "clean": "rimraf dist/",

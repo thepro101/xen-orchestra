@@ -647,4 +647,9 @@ export default async function main (args) {
   await fromEvent(xo, 'stopped')
 
   debug('bye :-)')
+
+  // not compatible with Node < 8.1
+  try {
+    require('why-is-node-running')()
+  } catch (_) {}
 }
