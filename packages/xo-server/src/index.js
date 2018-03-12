@@ -565,7 +565,9 @@ export default async function main (args) {
   const xo = new Xo(config)
 
   // Register web server close on XO stop.
-  xo.on('stop', () => pFromCallback(cb => webServer.close(cb)))
+  xo.on('stop', function closeWebServer () {
+    return pFromCallback(cb => webServer.close(cb))
+  })
 
   // Connects to all registered servers.
   await xo.start()
