@@ -920,7 +920,6 @@ export default class Xapi extends XapiBase {
     {
       deleteBase = false,
       detectBase = true,
-      disableStartAfterImport = true,
       mapVdisSrs = {},
       name_label = delta.vm.name_label,
       srId = this.pool.default_SR,
@@ -1070,17 +1069,7 @@ export default class Xapi extends XapiBase {
       ;this._deleteVm(baseVm)::ignoreErrors()
     }
 
-    await Promise.all([
-      this._setObjectProperties(vm, {
-        name_label,
-      }),
-      // FIXME: move
-      this._updateObjectMapProperty(vm, 'blocked_operations', {
-        start: disableStartAfterImport
-          ? 'Do not start this VM, clone it if you want to use it.'
-          : null,
-      }),
-    ])
+    await this._setObjectProperties(vm, { name_label })
 
     return { transferSize, vm }
   }
