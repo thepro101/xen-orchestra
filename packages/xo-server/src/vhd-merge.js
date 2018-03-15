@@ -2,7 +2,7 @@
 
 import assert from 'assert'
 import concurrency from 'limit-concurrency-decorator'
-import fu from '@nraynaud/struct-fu'
+import fu from 'struct-fu'
 import isEqual from 'lodash/isEqual'
 import { fromEvent } from 'promise-toolbox'
 
